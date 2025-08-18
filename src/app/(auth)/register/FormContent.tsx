@@ -14,6 +14,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { registerSchema, RegisterSchema } from '@/schema/user'
 import InputPassword from '@/components/ui/inputPassword'
+import { useState } from 'react'
+import envConfig from '@/config'
 
 export default function FormContent() {
   const form = useForm<RegisterSchema>({
@@ -26,10 +28,20 @@ export default function FormContent() {
     },
     mode: 'all',
   })
+  const [isLoading, setIsLoading] = useState(false)
 
-  const onSubmit = (data: RegisterSchema) => {
-    console.log(data)
-    // Handle form submission logic here
+  async function onSubmit(data: RegisterSchema) {
+    const result = await fetch(
+      `${envConfig.NEXT_PUBLIC_API_URL}/api/auth/register`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      },
+    )
+    const resData = await result.json()
   }
 
   return (
@@ -46,11 +58,11 @@ export default function FormContent() {
               name='username'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className='text-white'>User Name</FormLabel>
+                  <FormLabel className='text-white'>Tên</FormLabel>
                   <FormControl>
                     <Input
                       className='text-white placeholder:text-white/50'
-                      placeholder='Enter your Username...'
+                      placeholder='Nhập tên của bạn...'
                       {...field}
                       type='text'
                     />
@@ -68,7 +80,7 @@ export default function FormContent() {
                   <FormControl>
                     <Input
                       className='text-white placeholder:text-white/50'
-                      placeholder='Enter your Email...'
+                      placeholder='Nhập email của bạn...'
                       {...field}
                       type='email'
                     />
@@ -82,11 +94,11 @@ export default function FormContent() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className='text-white'>Passwords</FormLabel>
+                  <FormLabel className='text-white'>Mật khẩu</FormLabel>
                   <FormControl>
                     <InputPassword
                       className='text-white placeholder:text-white/50'
-                      placeholder='Enter your Password...'
+                      placeholder='Nhập mật khẩu của bạn...'
                       {...field}
                     />
                   </FormControl>
@@ -99,11 +111,13 @@ export default function FormContent() {
               name='rePassword'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className='text-white'>Re-Password</FormLabel>
+                  <FormLabel className='text-white'>
+                    Xác nhận mật khẩu
+                  </FormLabel>
                   <FormControl>
                     <InputPassword
                       className='text-white placeholder:text-white/50'
-                      placeholder='Enter your Password again...'
+                      placeholder='Nhập lại mật khẩu của bạn...'
                       {...field}
                     />
                   </FormControl>
@@ -119,12 +133,10 @@ export default function FormContent() {
           type='submit'
           className='w-full cursor-pointer'
           form='formRegister'
+          disabled={isLoading}
         >
-          Register
+          {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
         </Button>
-        {/* <Button variant='outline' className='w-full'>
-          Login with Google
-        </Button> */}
       </CardFooter>
     </>
   )

@@ -1,4 +1,4 @@
-import { Home, Package, User } from "lucide-react"
+import {  Package, User } from "lucide-react"
 
 export const menuData = [
   {
