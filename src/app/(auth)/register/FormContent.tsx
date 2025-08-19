@@ -17,6 +17,7 @@ import InputPassword from '@/components/ui/inputPassword'
 import { useState } from 'react'
 import { API_MESSAGES } from '@/lib/constants'
 import { toast } from 'sonner'
+import { Register } from '@/services/auth'
 
 type FieldError = {
   type: 'field-errors'
@@ -37,38 +38,12 @@ export default function FormContent() {
   })
   const [isLoading, setIsLoading] = useState(false)
 
-  async function registerUser(data: RegisterSchema) {
-    const { rePassword, ...payload } = data
-    const result = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...payload,
-        email: payload.email.toLowerCase(), // Đảm bảo email được lưu dưới dạng chữ thường
-      }),
-    })
-    const resData = await result.json()
-    if (!result.ok) {
-      if (resData.errors) {
-        throw {
-          type: 'field-errors',
-          errors: resData.errors,
-          message: resData.message,
-        }
-      }
-      throw new Error(resData.message || API_MESSAGES.REGISTRATION.SERVER_ERROR)
-    }
-    return resData
-  }
-
   const onSubmit = async (data: RegisterSchema) => {
     setIsLoading(true)
     form.clearErrors()
 
     try {
-      await registerUser(data)
+      await Register(data)
       toast.success(API_MESSAGES.REGISTRATION.SUCCESS)
     } catch (error: unknown) {
       if (
@@ -132,6 +107,7 @@ export default function FormContent() {
                     <Input
                       className='text-white placeholder:text-white/50'
                       placeholder='Nhập email của bạn...'
+                      lang='en'
                       {...field}
                       type='email'
                     />
@@ -150,6 +126,7 @@ export default function FormContent() {
                     <InputPassword
                       className='text-white placeholder:text-white/50'
                       placeholder='Nhập mật khẩu của bạn...'
+                      lang='en'
                       {...field}
                     />
                   </FormControl>
@@ -169,6 +146,7 @@ export default function FormContent() {
                     <InputPassword
                       className='text-white placeholder:text-white/50'
                       placeholder='Nhập lại mật khẩu của bạn...'
+                      lang='en'
                       {...field}
                     />
                   </FormControl>

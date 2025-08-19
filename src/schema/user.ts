@@ -1,5 +1,5 @@
 import {z} from 'zod'
-import { VALIDATION_MESSAGES } from '@/lib/constants'
+import { API_MESSAGES, VALIDATION_MESSAGES } from '@/lib/constants'
 
 export const registerSchema = z.object({
     name: z.string().min(1, {message: VALIDATION_MESSAGES.USERNAME.REQUIRED}),
@@ -10,7 +10,8 @@ export const registerSchema = z.object({
         .regex(/[a-z]/, { message: VALIDATION_MESSAGES.PASSWORD.LOWERCASE })
         .regex(/[0-9]/, { message: VALIDATION_MESSAGES.PASSWORD.NUMBER })
         .regex(/[^A-Za-z0-9]/, { message: VALIDATION_MESSAGES.PASSWORD.SPECIAL })
-        .refine((val) => !/[À-ỹà-ỹ]/.test(val), { message: VALIDATION_MESSAGES.PASSWORD.NO_ACCENTS }),
+        .refine((val) => !/[À-ỹà-ỹ]/.test(val), { message: VALIDATION_MESSAGES.PASSWORD.NO_ACCENTS })
+        .refine((val) => !/\s/.test(val), { message: API_MESSAGES.REGISTRATION.PASSWORD_NO_SPACE }),
     rePassword: z.string().min(1, {message: VALIDATION_MESSAGES.RE_PASSWORD.REQUIRED
     }),
     }).refine((data) => data.password === data.rePassword, {

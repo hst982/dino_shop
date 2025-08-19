@@ -54,10 +54,10 @@ export async function POST(req: Request) {
 
         // Gửi email xác thực
         sendVerificationEmail(email, token).catch(error => {
-            console.warn('Failed to send verification email:', error)
+            console.warn('Lỗi không thể gửi email xác thực:', error)
         })
 
-        return NextResponse.json({ message: "User registered. Please check your email to verify." }, { status: 201 });
+        return NextResponse.json({ message: API_MESSAGES.REGISTRATION.SUCCESS }, { status: 201 });
 
     }catch (error) {
         return NextResponse.json({message: API_MESSAGES.REGISTRATION.SERVER_ERROR , success: false }, { status: 500 })

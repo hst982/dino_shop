@@ -15,6 +15,7 @@ export const API_MESSAGES = {
     NAME_REQUIRED: 'Tên người dùng không được để trống',
     EMAIL_REQUIRED: 'Email không được để trống',
     PASSWORD_REQUIRED: 'Mật khẩu không được để trống',
+    PASSWORD_NO_SPACE: 'Mật khẩu không được chứa khoảng trắng',
   }
 } as const
 

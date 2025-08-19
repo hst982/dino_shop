@@ -15,14 +15,14 @@ export default function LoginPage() {
     <div className='registerPage'>
       <Card className='w-full max-w-sm border border-white/30 bg-white/10 backdrop-blur-lg p-6 overflow-hidden'>
         <CardHeader className='p-0'>
-          <CardTitle className='text-white'>Login</CardTitle>
+          <CardTitle className='text-white'>Đăng nhập</CardTitle>
           <CardDescription className='text-white/50'>
-            Sign in for a shopping experience with DinoShop
+            Đăng nhập trải nghiệm mua sắm với Dino Shop
           </CardDescription>
           <CardAction>
             <Button variant='link' asChild>
               <Link href='/register' className='text-white hover:text-white/80'>
-                <span>Sign Up</span>
+                <span>Đăng ký</span>
               </Link>
             </Button>
           </CardAction>
