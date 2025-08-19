@@ -2,7 +2,7 @@ import {z} from 'zod'
 import { VALIDATION_MESSAGES } from '@/lib/constants'
 
 export const registerSchema = z.object({
-    username: z.string().min(1, {message: VALIDATION_MESSAGES.USERNAME.REQUIRED}),
+    name: z.string().min(1, {message: VALIDATION_MESSAGES.USERNAME.REQUIRED}),
     email: z.string().email({message: VALIDATION_MESSAGES.EMAIL.INVALID}),
     password: z.string()
         .min(8, { message: VALIDATION_MESSAGES.PASSWORD.MIN_LENGTH })

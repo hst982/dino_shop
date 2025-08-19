@@ -15,13 +15,20 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { registerSchema, RegisterSchema } from '@/schema/user'
 import InputPassword from '@/components/ui/inputPassword'
 import { useState } from 'react'
-import envConfig from '@/config'
+import { API_MESSAGES } from '@/lib/constants'
+import { toast } from 'sonner'
+
+type FieldError = {
+  type: 'field-errors'
+  errors: Record<string, string>
+  message: string
+}
 
 export default function FormContent() {
   const form = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: '',
+      name: '',
       email: '',
       password: '',
       rePassword: '',
@@ -30,18 +37,62 @@ export default function FormContent() {
   })
   const [isLoading, setIsLoading] = useState(false)
 
-  async function onSubmit(data: RegisterSchema) {
-    const result = await fetch(
-      `${envConfig.NEXT_PUBLIC_API_URL}/api/auth/register`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+  async function registerUser(data: RegisterSchema) {
+    const { rePassword, ...payload } = data
+    const result = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+      body: JSON.stringify({
+        ...payload,
+        email: payload.email.toLowerCase(), // Đảm bảo email được lưu dưới dạng chữ thường
+      }),
+    })
     const resData = await result.json()
+    if (!result.ok) {
+      if (resData.errors) {
+        throw {
+          type: 'field-errors',
+          errors: resData.errors,
+          message: resData.message,
+        }
+      }
+      throw new Error(resData.message || API_MESSAGES.REGISTRATION.SERVER_ERROR)
+    }
+    return resData
+  }
+
+  const onSubmit = async (data: RegisterSchema) => {
+    setIsLoading(true)
+    form.clearErrors()
+
+    try {
+      await registerUser(data)
+      toast.success(API_MESSAGES.REGISTRATION.SUCCESS)
+    } catch (error: unknown) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'type' in error &&
+        error.type === 'field-errors'
+      ) {
+        const fieldError = error as FieldError
+
+        Object.entries(fieldError.errors).forEach(([field, message]) => {
+          form.setError(field as keyof RegisterSchema, { message })
+        })
+        toast.error(fieldError.message)
+      } else {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : API_MESSAGES.REGISTRATION.SERVER_ERROR,
+        )
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -55,7 +106,7 @@ export default function FormContent() {
           >
             <FormField
               control={form.control}
-              name='username'
+              name='name'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='text-white'>Tên</FormLabel>

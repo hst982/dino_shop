@@ -12,6 +12,9 @@ export const API_MESSAGES = {
     MISSING_FIELDS: 'Thiếu thông tin bắt buộc',
     USER_EXISTS_EMAIL: 'Email đã tồn tại',
     SERVER_ERROR: 'Lỗi server, vui lòng thử lại sau',
+    NAME_REQUIRED: 'Tên người dùng không được để trống',
+    EMAIL_REQUIRED: 'Email không được để trống',
+    PASSWORD_REQUIRED: 'Mật khẩu không được để trống',
   }
 } as const
 
