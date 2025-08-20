@@ -103,6 +103,7 @@ export default function FormContent() {
                       lang='en'
                       {...field}
                       type='email'
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage className='text-[0.8rem] italic' />
@@ -121,6 +122,7 @@ export default function FormContent() {
                       placeholder='Nhập mật khẩu...'
                       lang='en'
                       {...field}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage className='text-[0.8rem] italic' />

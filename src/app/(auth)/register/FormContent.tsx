@@ -91,6 +91,7 @@ export default function FormContent() {
                       placeholder='Nhập tên của bạn...'
                       {...field}
                       type='text'
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage className='text-[0.8rem] italic' />
@@ -110,6 +111,7 @@ export default function FormContent() {
                       lang='en'
                       {...field}
                       type='email'
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage className='text-[0.8rem] italic' />
@@ -128,6 +130,7 @@ export default function FormContent() {
                       placeholder='Nhập mật khẩu của bạn...'
                       lang='en'
                       {...field}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage className='text-[0.8rem] italic' />
@@ -148,6 +151,7 @@ export default function FormContent() {
                       placeholder='Nhập lại mật khẩu của bạn...'
                       lang='en'
                       {...field}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage className='text-[0.8rem] italic' />

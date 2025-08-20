@@ -21,7 +21,8 @@ export async function POST(req: Request) {
             }, { status: 400 })
         }
         // Kiểm tra xem người dùng đã tồn tại chưa
-        const existingUser = await prisma.user.findUnique({ where: { email } })
+        const existingUser = await prisma.user.findUnique({ where: { email: email.toLowerCase()
+         } })
         if (existingUser) {
             return NextResponse.json({ 
                 type: 'field-errors',
