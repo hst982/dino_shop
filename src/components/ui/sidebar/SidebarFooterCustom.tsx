@@ -1,32 +1,22 @@
 'use client'
 import { SidebarFooter } from '@/components/ui/sidebar'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '@/redux/store'
-import { useEffect } from 'react'
-import { api } from '@/lib/axios'
-import { setUser } from '@/redux/userSlice'
+import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from 'next/navigation'
 
 export default function SidebarFooterCustom() {
-  const dispatch = useDispatch()
-  useEffect(() => {
-    // gọi auth/me để lấy thông tin user
-    const fetchUser = async () => {
-      const accessToken = localStorage.getItem('accessToken')
-      if (!accessToken) return
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-      const meRes = await api.get('/auth/me')
-      const user = meRes.data
+  const { user, handleLogout } = useAuth()
+  const router = useRouter()
 
-      // lưu thông tin user vào redux
-      dispatch(setUser(user))
-    }
-    fetchUser()
-  }, [dispatch])
-  const user = useSelector((state: RootState) => state.users)
+  const handleLogoutAndRedirect = async () => {
+    await handleLogout()
+    router.push('/login')
+  }
+
   return (
     <SidebarFooter>
       <h1>footer</h1>
       <h2>{user ? user.name : ''}</h2>
+      <button onClick={handleLogoutAndRedirect}>Đăng xuất</button>
     </SidebarFooter>
   )
 }

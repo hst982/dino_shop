@@ -16,7 +16,7 @@ export default function Header() {
           <div className='flex items-center gap-2'>
             <CartButton />
             <ButtonToggleTheme />
-            {/* <AvatarHeader /> */}
+            <AvatarHeader />
           </div>
         </div>
       </div>
