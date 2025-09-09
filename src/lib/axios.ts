@@ -1,23 +1,28 @@
-import axios from 'axios'
+import axios from "axios"
 
 export const api = axios.create({
   baseURL: '/api',
-  withCredentials: true, // gửi cookie tự động
+  withCredentials: true, // gửi cookie HttpOnly khi gọi API
 })
 
-// Axios interceptor để refresh token tự động
+// Interceptor để tự refresh token
 api.interceptors.response.use(
   res => res,
   async err => {
-    const originalRequest = err.config
-    if (err.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
+    if (err.response?.status === 401 && !err.config._retry) {
+      err.config._retry = true
       try {
-        await axios.post('/api/auth/refresh-token', {}, { withCredentials: true })
-        return api(originalRequest)
-      } catch {
-        // token hết hạn → logout
-        window.location.href = '/login'
+        const refresh = await api.post("/auth/refresh")
+        const newAccessToken = refresh.data.accessToken
+
+        // gắn lại token mới vào header
+        api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`
+        err.config.headers["Authorization"] = `Bearer ${newAccessToken}`
+
+        return api(err.config) // gọi lại request cũ
+      } catch (refreshError) {
+        console.error("Refresh token fail")
+        return Promise.reject(refreshError)
       }
     }
     return Promise.reject(err)

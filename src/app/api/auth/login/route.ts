@@ -2,6 +2,7 @@ import { API_MESSAGES } from "@/lib/constants"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
 
 export async function POST(req: Request) {
     try {
@@ -46,15 +47,61 @@ export async function POST(req: Request) {
             }, { status: 400 })
         }
 
-        // Xóa mật khẩu trước khi trả về thông tin người dùng
-        const { password: _, ...userWithoutPassword } = user
-        return NextResponse.json({
+        // Tạo access token
+        if (!process.env.JWT_ACCESS_SECRET) {
+            throw new Error("JWT_ACCESS_SECRET không được định nghĩa")
+        }
+        const accessToken = jwt.sign({
+            id: user.id,
+            role: user.role
+        }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' })
+
+        // Tạo refresh token
+        if(!process.env.JWT_REFRESH_SECRET){
+            throw new Error("JWT_REFRESH_SECRET không được định nghĩa")
+        }
+
+        const refreshToken = jwt.sign({
+            id: user.id,
+            email: user.email,
+            role: user.role
+        }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d'})
+
+        await prisma.refreshToken.create({
+            data: {
+                token: refreshToken,
+                userId: user.id,
+                expiresAt: new Date(Date.now() + 7*24*60*60*1000) // 7 days
+            }
+        })
+
+        const response = NextResponse.json({
             message: 'Đăng nhập thành công',
             success: true,
-            data: userWithoutPassword
-        }, { status: 200 })
+            data: {
+                accessToken,
+                // user: {
+                //     id: user.id,
+                //     email: user.email,
+                //     role: user.role,
+                // }
+            }
+        }, { status: 200 });
+
+        // Set refresh token cookie
+        response.cookies.set(
+            "refreshToken",
+            refreshToken,
+            {
+                httpOnly: true,
+                sameSite: 'strict',
+                path: '/'
+            }
+        );
+
+        return response;
         
     }catch (error) {
-        return NextResponse.json({ message: API_MESSAGES.REGISTRATION.SERVER_ERROR, success: false }, { status: 500 })
+        return NextResponse.json({ message: API_MESSAGES.REGISTRATION.SERVER_ERROR || error, success: false }, { status: 500 })
     }
 }
