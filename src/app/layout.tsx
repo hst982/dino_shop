@@ -3,6 +3,7 @@ import { Inter, Montserrat, Permanent_Marker } from 'next/font/google'
 import '@/app/globals.css'
 import { ThemeProvider } from '@/contexts/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
+import AuthProvider from '@/components/AuthProvider'
 // import SessionProviderWrapper from '@/app/sesionProviderWrapper'
 
 const inter = Inter({
@@ -51,7 +52,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <AuthProvider>{children}</AuthProvider>
           <Toaster richColors position='top-right' />
         </ThemeProvider>
       </body>

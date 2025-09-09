@@ -19,6 +19,9 @@ import { Login } from '@/services/auth'
 import { toast } from 'sonner'
 import { API_MESSAGES } from '@/lib/constants'
 import { useRouter } from 'next/navigation'
+import { api } from '@/lib/axios'
+import { useDispatch } from 'react-redux'
+import { setUser } from '@/redux/userSlice'
 
 type FieldError = {
   type: 'field-errors'
@@ -37,20 +40,32 @@ export default function FormContent() {
   })
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const dispatch = useDispatch()
 
   const onSubmit = async (data: LoginSchema) => {
     setIsLoading(true)
     form.clearErrors()
 
     try {
-      const user = await Login(data)
+      const res = await Login(data)
+      console.log(res)
+      const accessToken = res.data.accessToken
+      localStorage.setItem('accessToken', accessToken)
       toast.success('Chào mừng trở lại')
       setIsLoading(false)
-      // Redirect or perform any other action after successful login
 
-      if (
-        ['SUPERADMIN', 'ADMIN', 'STAFF', 'MANAGER'].includes(user.data.role)
-      ) {
+      // lưu accessToken vào localStorage
+      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
+
+      // gọi auth/me để lấy thông tin user
+      const meRes = await api.get('/auth/me')
+      const user = meRes.data
+
+      // lưu thông tin user vào redux
+      dispatch(setUser(user))
+
+      // Redirect or perform any other action after successful login
+      if (['SUPERADMIN', 'ADMIN', 'STAFF', 'MANAGER'].includes(user.role)) {
         router.push('/admin')
       } else {
         router.push('/')
